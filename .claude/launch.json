@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "agente-webhook",
+      "runtimeExecutable": ".venv/Scripts/python",
+      "runtimeArgs": ["-m", "uvicorn", "app.main:app", "--env-file", ".env", "--host", "127.0.0.1", "--port", "8000"],
+      "port": 8000
+    }
+  ]
+}

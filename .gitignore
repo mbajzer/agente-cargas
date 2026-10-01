@@ -1,0 +1,8 @@
+.venv/
+.env
+__pycache__/
+.pytest_cache/
+# dicionário de dados interno: referência local, não é usado pelo código
+*.xlsx
+# anotações locais com credenciais: nunca versionar
+Senhas.txt

@@ -1,0 +1,55 @@
+# Blueprint do Render: New > Blueprint > selecione o repositório.
+# Dois serviços independentes: conector MCP (Claude) e agente de WhatsApp (Twilio).
+# As variáveis com `sync: false` são pedidas na criação (segredos não ficam no repositório).
+services:
+  - type: web
+    name: luveo-mcp
+    runtime: python
+    region: virginia          # mesma região do banco (Supabase us-east-1)
+    plan: starter             # o plano free "dorme" após inatividade
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.mcp_main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # --- segredos: preencher no painel ---
+      - key: AGENTE_DB_URL    # role agente_app, pooler porta 6543, senha com URL-encoding
+        sync: false
+      - key: SUPABASE_URL     # https://<project_ref>.supabase.co (projeto da AGT)
+        sync: false
+      - key: MCP_PUBLIC_URL   # URL pública deste serviço, ex.: https://luveo-mcp.onrender.com
+        sync: false
+      - key: SUPABASE_JWT_ALG # ES256 ou RS256, conforme a chave de assinatura do projeto
+        value: ES256
+
+  - type: web
+    name: agente-whatsapp
+    runtime: python
+    region: virginia          # mesma região do banco (Supabase us-east-1)
+    plan: starter             # o free "dorme" e a Twilio desiste do webhook após 15 s
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: AGENTE_MODEL
+        value: claude-haiku-4-5
+      - key: AGENTE_LIMITE_POR_HORA
+        value: "30"
+      # --- segredos: preencher no painel ---
+      - key: AGENTE_DB_URL        # role agente_app, pooler porta 6543, senha com URL-encoding
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_WHATSAPP_FROM # sandbox: +14155238886; produção: número do sender aprovado
+        sync: false
+      - key: TWILIO_WEBHOOK_URL   # https://agente-whatsapp.onrender.com/webhook (exatamente a da Twilio)
+        sync: false

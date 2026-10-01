@@ -1,0 +1,9 @@
+# Versões testadas com o banco AGT em 29/09/2026
+fastapi~=0.141.1
+uvicorn[standard]~=0.53.0
+httpx~=0.28.1
+asyncpg~=0.31.0
+anthropic~=1.8.0
+tzdata>=2026.4  # zoneinfo no Windows
+fastmcp~=4.0.10
+twilio~=9.11.2
